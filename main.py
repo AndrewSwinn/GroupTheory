@@ -116,7 +116,7 @@ def on_key(event):
 
     if event.key == 'Y':
        # moves = 'rRCrFSUVrCSuUrM  DCDUCd-BFRlFRLF-RGRGERVrGL-ECVEMVGVC'
-        moves  = 'rluLrdRDUluRUuuubuLFbrbu-frbVMFEFr--'
+        moves  = 'UUUFdldDBrfrdrLlRlrD  VRfu-LfrBVrBl'
         move_cube(moves)
         t.twist(moves)
         print(t.print_cube())

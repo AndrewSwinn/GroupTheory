@@ -66,24 +66,24 @@ class ThistleCube:
         edges = [0x10, 0x11, 0x12, 0x13, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B]
         corners = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07]
         parity = [0x00]
-        if cube is None:
-            self.cube = bytes(edges + corners + parity)
-        else:
-            self.cube = cube.cube
+
+        self.cube = bytes(edges + corners + parity) if cube==None else cube.cube
 
     def move_cube(self, moves):
 
         for m in moves:
 
-            move = self.moves_dict[m]
+            if m in self.moves_dict.keys():
 
-            new_cube_array  = ([self.cube[0x0F & move[i]] ^ (move[i] & 0xF0) for i in range(0, 12)] +
-                               [(self.cube[12 + (0x0F & move[j])] & 0x0F) + (
-                                           ((self.cube[12 + (0x0F & move[j])] & 0xF0) + (move[j] & 0xF0)) % 0xC0)
-                                for j in range(12, 20)] +
-                               [self.cube[20] ^ move[20]])
+                move = self.moves_dict[m]
 
-            self.cube = bytes(new_cube_array)
+                new_cube_array  = ([self.cube[0x0F & move[i]] ^ (move[i] & 0xF0) for i in range(0, 12)] +
+                                   [(self.cube[12 + (0x0F & move[j])] & 0x0F) + (
+                                               ((self.cube[12 + (0x0F & move[j])] & 0xF0) + (move[j] & 0xF0)) % 0xC0)
+                                    for j in range(12, 20)] +
+                                   [self.cube[20] ^ move[20]])
+
+                self.cube = bytes(new_cube_array)
 
     def reverse(self, moves):
 
@@ -98,10 +98,10 @@ class ThistleCube:
     def solve(self):
 
         solution = ''
-        temp_cube = ThistleCube(self)
+        temp_cube = ThistleCube(cube=self)
+       # print(temp_cube.cube)
 
-        for group in range(0,4):
-
+        for group in range(0,2):
             if group > 0: solution = solution + '-'
 
             masked_cube = bytes([temp_cube.cube[i] & self.bit_masks[group][i] for i in range(0,21)])
@@ -109,18 +109,10 @@ class ThistleCube:
             for moves, group_cube in self.thistle_tables[group].items():
                 group_cube = bytes([group_cube[i] & self.bit_masks[group][i] for i in range(0,21)])
                 if group_cube == masked_cube:
-              #      print(moves)
                     solution = solution +  self.reverse(moves)
-                    temp_cube.move_cube(temp_cube.reverse(moves))
+                    temp_cube.move_cube(self.reverse(moves))
               #      print('Group:', group, 'solution', self.reverse(moves), temp_cube.cube)
-
-                    break
-
-
-
-
-
-
+               #             break
         return solution
 
 
