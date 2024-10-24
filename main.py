@@ -16,63 +16,60 @@ from src.ThistleCube import ThistleCube
 import random
 
 
-totalmoves = " "
-
 def move_cube(moves):
 
-    global totalmoves
+    for m in moves:
 
-    totalmoves = totalmoves + moves
+        if m == 'R': c.move_queue.put({'axis': 'x', 'layer': 3, 'direction': -1})
+        if m == 'r': c.move_queue.put({'axis': 'x', 'layer': 3, 'direction': 1})
+        if m == 'S': c.move_queue.put({'axis': 'x', 'layer': 3, 'direction': 1});c.move_queue.put(
+            {'axis': 'x', 'layer': 3, 'direction': 1})
 
-    if moves != '':
+        if m == 'L': c.move_queue.put({'axis': 'x', 'layer': 1, 'direction': 1})
+        if m == 'l': c.move_queue.put({'axis': 'x', 'layer': 1, 'direction': -1})
+        if m == 'M': c.move_queue.put({'axis': 'x', 'layer': 1, 'direction': -1});c.move_queue.put(
+            {'axis': 'x', 'layer': 1, 'direction': -1})
 
-        for m in moves:
+        if m == 'X': c.move_queue.put({'axis': 'x', 'layer': 0, 'direction': 1})
+        if m == 'x': c.move_queue.put({'axis': 'x', 'layer': 0, 'direction': -1})
 
-            if m == 'R': c.move_queue.put({'axis': 'x', 'layer': 3, 'direction': -1})
-            if m == 'r': c.move_queue.put({'axis': 'x', 'layer': 3, 'direction': 1})
-            if m == 'S': c.move_queue.put({'axis': 'x', 'layer': 3, 'direction': 1});c.move_queue.put(
-                {'axis': 'x', 'layer': 3, 'direction': 1})
+        if m == 'B': c.move_queue.put({'axis': 'y', 'layer': 3, 'direction': 1})
+        if m == 'b': c.move_queue.put({'axis': 'y', 'layer': 3, 'direction': -1})
+        if m == 'C': c.move_queue.put({'axis': 'y', 'layer': 3, 'direction': -1}); c.move_queue.put(
+            {'axis': 'y', 'layer': 3, 'direction': -1})
 
-            if m == 'L': c.move_queue.put({'axis': 'x', 'layer': 1, 'direction': 1})
-            if m == 'l': c.move_queue.put({'axis': 'x', 'layer': 1, 'direction': -1})
-            if m == 'M': c.move_queue.put({'axis': 'x', 'layer': 1, 'direction': -1});c.move_queue.put(
-                {'axis': 'x', 'layer': 1, 'direction': -1})
+        if m == 'F': c.move_queue.put({'axis': 'y', 'layer': 1, 'direction': -1})
+        if m == 'f': c.move_queue.put({'axis': 'y', 'layer': 1, 'direction': 1})
+        if m == 'G': c.move_queue.put({'axis': 'y', 'layer': 1, 'direction': 1}); c.move_queue.put(
+            {'axis': 'y', 'layer': 1, 'direction': 1})
 
-            if m == 'X': c.move_queue.put({'axis': 'x', 'layer': 0, 'direction': 1})
-            if m == 'x': c.move_queue.put({'axis': 'x', 'layer': 0, 'direction': -1})
+        if m == 'Y': c.move_queue.put({'axis': 'y', 'layer': 0, 'direction': 1})
+        if m == 'y': c.move_queue.put({'axis': 'y', 'layer': 0, 'direction': -1})
 
-            if m == 'B': c.move_queue.put({'axis': 'y', 'layer': 3, 'direction': 1})
-            if m == 'b': c.move_queue.put({'axis': 'y', 'layer': 3, 'direction': -1})
-            if m == 'C': c.move_queue.put({'axis': 'y', 'layer': 3, 'direction': -1}); c.move_queue.put(
-                {'axis': 'y', 'layer': 3, 'direction': -1})
+        if m == 'U': c.move_queue.put({'axis': 'z', 'layer': 3, 'direction': -1})
+        if m == 'u': c.move_queue.put({'axis': 'z', 'layer': 3, 'direction': 1})
+        if m == 'V': c.move_queue.put({'axis': 'z', 'layer': 3, 'direction': 1}); c.move_queue.put(
+            {'axis': 'z', 'layer': 3, 'direction': 1})
 
-            if m == 'F': c.move_queue.put({'axis': 'y', 'layer': 1, 'direction': -1})
-            if m == 'f': c.move_queue.put({'axis': 'y', 'layer': 1, 'direction': 1})
-            if m == 'G': c.move_queue.put({'axis': 'y', 'layer': 1, 'direction': 1}); c.move_queue.put(
-                {'axis': 'y', 'layer': 1, 'direction': 1})
+        if m == 'D': c.move_queue.put({'axis': 'z', 'layer': 1, 'direction': 1})
+        if m == 'd': c.move_queue.put({'axis': 'z', 'layer': 1, 'direction': -1})
+        if m == 'E': c.move_queue.put({'axis': 'z', 'layer': 1, 'direction': -1});c.move_queue.put(
+            {'axis': 'z', 'layer': 1, 'direction': -1})
 
-            if m == 'Y': c.move_queue.put({'axis': 'y', 'layer': 0, 'direction': 1})
-            if m == 'y': c.move_queue.put({'axis': 'y', 'layer': 0, 'direction': -1})
+        if m == 'Z': c.move_queue.put({'axis': 'z', 'layer': 0, 'direction': 1})
+        if m == 'z': c.move_queue.put({'axis': 'z', 'layer': 0, 'direction': -1})
 
-            if m == 'U': c.move_queue.put({'axis': 'z', 'layer': 3, 'direction': -1})
-            if m == 'u': c.move_queue.put({'axis': 'z', 'layer': 3, 'direction': 1})
-            if m == 'V': c.move_queue.put({'axis': 'z', 'layer': 3, 'direction': 1}); c.move_queue.put(
-                {'axis': 'z', 'layer': 3, 'direction': 1})
+        d.twist(m)
+        t.move_cube(m)
 
-            if m == 'D': c.move_queue.put({'axis': 'z', 'layer': 1, 'direction': 1})
-            if m == 'd': c.move_queue.put({'axis': 'z', 'layer': 1, 'direction': -1})
-            if m == 'E': c.move_queue.put({'axis': 'z', 'layer': 1, 'direction': -1});c.move_queue.put(
-                {'axis': 'z', 'layer': 1, 'direction': -1})
 
-            if m == 'Z': c.move_queue.put({'axis': 'z', 'layer': 0, 'direction': 1})
-            if m == 'z': c.move_queue.put({'axis': 'z', 'layer': 0, 'direction': -1})
 
 
 def scramble_cube():
-    moves = ""
+
     for m in range(20):
-        moves = moves + random.choice('RrLlUuDdFfBb')
-    move_cube(moves)
+        move_cube(random.choice('RrLlUuDdFfBb'))
+
 
 def onclick(event):
     print('%s click: button=%d, x=%d, y=%d, xdata=%f, ydata=%f' %
@@ -80,8 +77,6 @@ def onclick(event):
            event.x, event.y, event.xdata, event.ydata))
 
 def on_key(event):
-
-    global totalmoves
 
     if event.key == 'R': move_cube('R')
     if event.key == 'r': move_cube('r')
@@ -99,34 +94,45 @@ def on_key(event):
 
     if event.key == 'S':
 
-        d.twist(totalmoves)
-        move_cube(d.solve())
-        totalmoves=""
+        solution = d.solve()
+        move_cube(solution)
+
+    if event.key == '1':
+        solution = t.solve(group=1)
+        print(solution)
+        move_cube(solution)
+
+    if event.key == '2':
+        solution = t.solve(group=2)
+        print(solution)
+        move_cube(solution)
+
+    if event.key == '3':
+        solution = t.solve(group=3)
+        print(solution)
+        move_cube(solution)
 
     if event.key == 'T':
+        solution = t.solve()
+        print(solution)
+        move_cube(solution)
 
-        t.twist(totalmoves)
-        print(t.print_cube())
-        move_cube(t.solve())
-        print(t.print_cube())
 
     if event.key == 't':
 
-        print(t.print_cube())
+        print(t)
 
     if event.key == 'Y':
        # moves = 'rRCrFSUVrCSuUrM  DCDUCd-BFRlFRLF-RGRGERVrGL-ECVEMVGVC'
         moves  = 'UUUFdldDBrfrdrLlRlrD  VRfu-LfrBVrBl'
         move_cube(moves)
-        t.twist(moves)
-        print(t.print_cube())
-
-    if event.key == 'Q':  scramble_cube();
-
-    if event.key == 'X':  plt.close()
 
 
+    if event.key == 'Q': scramble_cube();
 
+    #if event.key == 'Z': reset_cube()
+
+    if event.key == 'X': plt.close()
 
 
 if __name__ == "__main__":
@@ -135,7 +141,7 @@ if __name__ == "__main__":
     fig = plt.figure()
     c = Cube(size, fig)
 
-    t = ThistleSolve()
+    t = ThistleCube()
     #t.BuildTables()
 
     d = SimpleSolve()

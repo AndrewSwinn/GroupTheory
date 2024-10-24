@@ -148,12 +148,12 @@ class Cube(Artist):
 
             self.Stickers.append(Sticker(
                 [FourVector().load([[x], [y], [z], [1]]), FourVector().load([[x + 1], [y], [z], [1]]),
-                 FourVector().load([[x + 1], [y + 1], [z], [1]]), FourVector().load([[x], [y + 1], [z], [1]])], 'red',
+                 FourVector().load([[x + 1], [y + 1], [z], [1]]), FourVector().load([[x], [y + 1], [z], [1]])], 'white',
                 s_id))
             self.Stickers.append(Sticker(
                 [FourVector().load([[x], [y], [-z], [1]]), FourVector().load([[x + 1], [y], [-z], [1]]),
                  FourVector().load([[x + 1], [y + 1], [-z], [1]]), FourVector().load([[x], [y + 1], [-z], [1]])],
-                'orange', s_id + 1))
+                'yellow', s_id + 1))
             self.Stickers.append(Sticker(
                 [FourVector().load([[z], [x], [y], [1]]), FourVector().load([[z], [x + 1], [y], [1]]),
                  FourVector().load([[z], [x + 1], [y + 1], [1]]), FourVector().load([[z], [x], [y + 1], [1]])], 'blue',
@@ -164,12 +164,12 @@ class Cube(Artist):
                 'green', s_id + 3))
             self.Stickers.append(Sticker(
                 [FourVector().load([[x], [z], [y], [1]]), FourVector().load([[x + 1], [z], [y], [1]]),
-                 FourVector().load([[x + 1], [z], [y + 1], [1]]), FourVector().load([[x], [z], [y + 1], [1]])], 'white',
+                 FourVector().load([[x + 1], [z], [y + 1], [1]]), FourVector().load([[x], [z], [y + 1], [1]])], 'orange',
                 s_id + 4))
             self.Stickers.append(Sticker(
                 [FourVector().load([[x], [-z], [y], [1]]), FourVector().load([[x + 1], [-z], [y], [1]]),
                  FourVector().load([[x + 1], [-z], [y + 1], [1]]), FourVector().load([[x], [-z], [y + 1], [1]])],
-                'yellow', s_id + 5))
+                'red', s_id + 5))
 
             s_id = s_id + 6
 
