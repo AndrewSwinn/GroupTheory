@@ -1124,6 +1124,15 @@ class SimpleSolve(np.ndarray):
 
             return (moves)
 
+        def restore_cube():
+
+            moves = invert_cube()
+
+
+
+            return moves
+
+
         solution = solve_centers()
         solution = solution + clear_cross()
         solution = solution + solve_cross()
@@ -1135,6 +1144,7 @@ class SimpleSolve(np.ndarray):
         solution = solution + fix_cross()
         solution = solution + final_corners()
         solution = solution + turn_corners()
+        solution = solution + restore_cube()
 
         return solution
 

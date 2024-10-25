@@ -67,8 +67,14 @@ def move_cube(moves):
 
 def scramble_cube():
 
+    scram = ''
+
     for m in range(20):
-        move_cube(random.choice('RrLlUuDdFfBb'))
+        move = random.choice('RrLlUuDdFfBb')
+        move_cube(move)
+        scram += move
+
+    print(scram)
 
 
 def onclick(event):
