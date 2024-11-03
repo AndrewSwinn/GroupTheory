@@ -807,34 +807,24 @@ class SimpleSolve(np.ndarray):
 
             moves = ''
 
-            # Remove any red edges from the top layer
-
-            q = 0
-
-            for z in range(4):
-
+            for col in [0]:
                 unsolved = True
-
                 while unsolved:
 
-                    q = q + 1
-
                     for i, j in product(possible_moves, current_moves):
-
                         t = copy.copy(self)
-
                         t = t.twist(moves + i + j)
-
                         current_moves.append(i + j)
+                        if t[0][1][0]['col'] == col and t[5][1][1]['col'] == 5:
 
-                        if (t[0][1][0]['col'] == 0 and t[4][1][1]['col'] == t[4][1][2]['col']):
                             unsolved = False
+                        break
 
-                            break
-
-                moves = moves + i + j + 'z'
+                moves = moves + i + j + 'U'
 
             self.twist(moves)
+
+            print(self)
 
             return (moves)
 
@@ -843,7 +833,7 @@ class SimpleSolve(np.ndarray):
             #               RYG             RYB         RWG       RWB
             red_corners = {0, 17, 15, 12, 53, 14, 36, 16, 51, 48, 52, 50}
 
-            possible_moves = ['LDl', 'Z']
+            possible_moves = ['LDl', 'FDf', 'RDr', 'BDb']
 
             current_moves = ['']
 
@@ -881,40 +871,28 @@ class SimpleSolve(np.ndarray):
 
         def solve_corners():
 
-            possible_moves = ['D', 'Ldl', 'dLDl', 'LdlfDDF', '']
-
+            #possible_moves = ['D', 'Ldl', 'dLDl', 'LdlfDDF', '']
+            possible_moves = ['U', 'Lul', 'uLUl', 'LulfUUF', '']
             current_moves = ['']
-
             moves = ''
 
             q = 0
 
-            for z in range(4):
-
+            for z in range(1):
                 unsolved = True
-
                 while unsolved:
-
                     q = q + 1
-
                     for i, j in product(possible_moves, current_moves):
-
                         t = copy.copy(self)
-
                         t = t.twist(moves + i + j)
-
                         current_moves.append(i + j)
-
                         if (t[0][0][0]['col'] == 0
                                 and t[4][0][2]['col'] == t[4][1][1]['col']):
                             #    and t[3][2][0]['col'] == t[3][1][1]['col']):
 
                             unsolved = False
-
                             break
-
                 moves = moves + i + j + 'z'
-
             self.twist(moves)
 
             return (moves)
@@ -1133,18 +1111,20 @@ class SimpleSolve(np.ndarray):
             return moves
 
 
-        solution = solve_centers()
-        solution = solution + clear_cross()
+        #solution = solve_centers()
+        solution = clear_cross()
         solution = solution + solve_cross()
-        solution = solution + clear_corners()
-        solution = solution + solve_corners()
-        solution = solution + invert_cube()
-        solution = solution + solve_middle()
-        solution = solution + top_cross()
-        solution = solution + fix_cross()
-        solution = solution + final_corners()
-        solution = solution + turn_corners()
-        solution = solution + restore_cube()
+        #solution = solution + clear_corners()
+        # solution = solution + solve_corners()
+        # solution = solution + invert_cube()
+        #solution = solution + solve_middle()
+        # solution = solution + top_cross()
+        # solution = solution + fix_cross()
+        # solution = solution + final_corners()
+        # solution = solution + turn_corners()
+        # solution = solution + restore_cube()
+
+        print(solution)
 
         return solution
 
