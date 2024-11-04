@@ -59,13 +59,25 @@ def move_cube(moves):
         if m == 'Z': c.move_queue.put({'axis': 'z', 'layer': 0, 'direction': 1})
         if m == 'z': c.move_queue.put({'axis': 'z', 'layer': 0, 'direction': -1})
 
-        d.twist(m)
+
         t.move_cube(m)
 
 
-
-
 def scramble_cube():
+
+    scram = 'DRRDDbDDuBDBFFUdrUud'
+
+    for move in scram:
+
+        move_cube(move)
+
+
+    print(scram)
+
+
+
+
+def qscramble_cube():
 
     scram = ''
 
@@ -77,12 +89,9 @@ def scramble_cube():
     print(scram)
 
 
-def onclick(event):
-    print('%s click: button=%d, x=%d, y=%d, xdata=%f, ydata=%f' %
-          ('double' if event.dblclick else 'single', event.button,
-           event.x, event.y, event.xdata, event.ydata))
-
 def on_key(event):
+
+    speed = 10
 
     if event.key == 'R': move_cube('R')
     if event.key == 'r': move_cube('r')
@@ -97,10 +106,14 @@ def on_key(event):
     if event.key == 'D':  move_cube('D')
     if event.key == 'd':  move_cube('d')
 
+    if event.key == 'up':    c.target_elev -= speed
+    if event.key == 'down':  c.target_elev += speed
+    if event.key == 'left':  c.target_azim += speed
+    if event.key == 'right': c.target_azim -= speed
 
     if event.key == 'S':
-
-        solution = d.solve()
+        c.target_azim, c.target_elev = -60, 30
+        solution = 'RRRR'
         move_cube(solution)
 
     if event.key == '1':
@@ -119,6 +132,7 @@ def on_key(event):
         move_cube(solution)
 
     if event.key == 'T':
+        c.target_azim, c.target_elev = -60, 30
         solution = t.solve()
         print(solution)
         move_cube(solution)
@@ -148,15 +162,6 @@ if __name__ == "__main__":
     c = Cube(size, fig)
 
     t = ThistleCube()
-    #t.BuildTables()
-
-    d = SimpleSolve()
-
-    #moves = d.scramble()
-
-    #move_cube(moves)
-
-    cid = fig.canvas.mpl_connect('button_press_event', onclick)
 
     cid = fig.canvas.mpl_connect('key_press_event', on_key)
 

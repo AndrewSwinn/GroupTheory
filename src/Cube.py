@@ -113,6 +113,10 @@ class Cube(Artist):
 
         #self.ax = fig.gca(projection='3d')
         self.ax = fig.add_subplot(projection='3d')
+
+        self.target_azim, self.target_elev = -60, 30
+        self.ax.view_init(azim=self.target_azim, elev=self.target_elev)
+
         self.ax.set_xlim3d(size * -0.50, size * 0.50)
         self.ax.set_ylim3d(size * -0.50, size * 0.50)
         self.ax.set_zlim3d(size * -0.50, size * 0.50)
@@ -188,6 +192,14 @@ class Cube(Artist):
                 f.transform(axis, layer, direction)
 
     def control_cube(self, frame):
+
+        # The cube is fixed in the x,y,z coordinate frame.
+        # To see the cube from different perspectives we change the viewing angle not the cube.
+
+        delta_azim, delta_elev = self.ax.azim - self.target_azim, self.ax.elev - self.target_elev
+
+        if abs(delta_azim) > 0: self.ax.azim -= int(delta_azim>0) - int(delta_azim<0)
+        if abs(delta_elev) > 0: self.ax.elev -= int(delta_elev>0) - int(delta_elev<0)
 
         # Not moving and no moves pending
         if self.moving == False and self.move_queue.empty():
