@@ -1,5 +1,10 @@
 import os
 import pickle
+import queue
+import random
+
+from requests.packages import target
+
 
 class ThistleCube:
 
@@ -142,9 +147,42 @@ class ThistleCube:
 
         numbers = numbers + ' ' + str(self.cube[20])
 
-
-
         return numbers + '  ' + colours
+
+    def optimal(self):
+
+        def distance(cube):
+            dist = 0
+            for target, edge in enumerate(cube.cube[0:12]):
+               dist += (edge != target)
+            return dist
+
+        searchtree = queue.PriorityQueue()
+        searchtree.put((distance(self), ['',  ThistleCube(cube=self)]))
+
+        while not searchtree.empty():
+            [queue_move, queue_cube] = searchtree.get()
+
+            print(queue_move, distance(queue_cube))
+
+            if distance(queue_cube) > 0:
+                for move in self.moves_dict.keys():
+                    test_cube = ThistleCube(cube=queue_cube)
+                    test_cube.move_cube(move)
+                    print(queue_move + move, distance(test_cube))
+                    searchtree.put((distance(test_cube), [queue_move + move, test_cube]) )
+            else:
+                break
+
+
+
+
+
+
+
+
+
+        return ''
 
 
 

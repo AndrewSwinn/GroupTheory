@@ -100,7 +100,7 @@ def on_key(event):
 
     if event.key == 'S':
         c.target_azim, c.target_elev = -60, 30
-        solution = 'RRRR'
+        solution = t.optimal()
         move_cube(solution)
 
     if event.key == '1':
