@@ -63,21 +63,8 @@ def move_cube(moves):
         t.move_cube(m)
 
 
+
 def scramble_cube():
-
-    scram = 'DRRDDbDDuBDBFFUdrUud'
-
-    for move in scram:
-
-        move_cube(move)
-
-
-    print(scram)
-
-
-
-
-def qscramble_cube():
 
     scram = ''
 
