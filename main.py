@@ -11,7 +11,6 @@
 
 from src.Cube import *
 from src.SimpleSolve import *
-from src.ThistleSolve import *
 from src.ThistleCube import ThistleCube
 import random
 
@@ -131,7 +130,7 @@ def on_key(event):
 
     if event.key == 'Y':
        # moves = 'rRCrFSUVrCSuUrM  DCDUCd-BFRlFRLF-RGRGERVrGL-ECVEMVGVC'
-        moves  = 'UUUFdldDBrfrdrLlRlrD  VRfu-LfrBVrBl'
+        moves  = 'buDfCFuUEVLLdMGCGULf bulGrfLEl'
         move_cube(moves)
 
 

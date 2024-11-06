@@ -8,6 +8,13 @@ from requests.packages import target
 
 class ThistleCube:
 
+    edges         = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B]
+    corners       = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07]
+    parity        = [0x00]
+    identity_cube = bytes(edges + corners + parity)
+
+    thistlewaite_tables = 'thistle.pickle'
+
     def generate_new(members, generators, subgroup_mask):
 
         members_list = set(
@@ -22,7 +29,7 @@ class ThistleCube:
                                    [(membercube[12 + (0x0F & generator[j])] & 0x0F) + (((membercube[12 + (
                                                0x0F & generator[j])] & 0xF0) + (generator[j] & 0xF0)) % 0xC0) for j in
                                     range(12, 20)] +
-                                   [cube[20] ^ generator[20]])
+                                   [membercube[20] ^ generator[20]])
                 new_twist = bytes(new_twist_array)
 
                 twist_masked = bytes([new_twist[i] & subgroup_mask[i] for i in range(0, 21)])
@@ -33,10 +40,7 @@ class ThistleCube:
 
         return new_members
 
-    thistle_tables = []
-
     moves_dict = {
-
         'R': bytes(b'\x00\x01\x07\x06\x04\x05\x02\x03\x08\t\n\x0b\x00\x01\x07\x06\x04\x05\x02\x03\x80'),
         'L': bytes(b'\x04\x05\x02\x03\x01\x00\x06\x07\x08\t\n\x0b\x05\x04\x02\x03\x00\x01\x06\x07\x80'),
         'F': bytes(b'\x00\x01\x02\x03\x04\t\x08\x07\x05\x06\n\x0b\x00\x86\x02\x84A\x05C\x07\x80'),
@@ -66,8 +70,34 @@ class ThistleCube:
                    [[0xFF], [0xFF], [0xF0]]]
     bit_masks = [bytes(group_mask[0] * 12 + group_mask[1] * 8 + group_mask[2]) for group_mask in group_masks]
 
-    with open(os.path.join(os.getcwd(), 'rsc', 'thistle_tables.dat'), 'rb') as f:
-        thistle_tables = pickle.load(f)
+    try:
+
+        with open(os.path.join(os.getcwd(), 'rsc', thistlewaite_tables), 'rb') as f:
+            thistle_tables = pickle.load(f)
+
+    except FileNotFoundError:
+        print('Generating Tables')
+        thistle_tables = []
+        for group in range(0, 4):
+            move_dict = dict()
+            for move_key in group_moves[group]:
+                move_dict[move_key] = moves_dict[move_key]
+            #move_dict = {move_key: moves_dict[move_key] for move_key in group_moves[group]}
+
+            #move_dict = moves_dict
+            bit_mask = bytes(group_masks[group][0] * 12 + group_masks[group][1] * 8 + group_masks[group][2])
+            new, members = 1, {'': identity_cube}
+            while new > 0:
+                new_members = generate_new(members, move_dict, bit_mask)
+                new = len(new_members)
+                members.update(new_members)
+            print(group, len(members))
+            thistle_tables.append(members)
+        with open(os.path.join(os.getcwd(), 'rsc', thistlewaite_tables), 'wb') as file:
+            pickle.dump(thistle_tables, file)
+
+
+
 
     def __init__(self, cube=None):
 

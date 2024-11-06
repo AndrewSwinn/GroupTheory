@@ -1,0 +1,4 @@
+# This preograsm was developed and tested on python version 3.12.7
+# with the following additional packages:
+
+# matplotlib 3.9.2
