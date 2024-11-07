@@ -3,6 +3,7 @@ import pickle
 import queue
 import random
 
+
 from requests.packages import target
 
 
@@ -181,41 +182,35 @@ class ThistleCube:
 
     def optimal(self):
 
-        def distance(cube):
-            dist = 0
-            for target, edge in enumerate(cube.cube[0:12]):
-               dist += (edge != target)
-            return dist
+        def heur(cube):
+            estimate = 0
+            for i in range(12):
+                if cube.cube[i] != i:
+                    estimate+=1 + (cube.cube[i]>12)
+            for i in range(0):
+                if cube.cube[12 + i] != i:
+                    estimate+=1 + (cube.cube[12 + i]>8)
+            return estimate
 
-        searchtree = queue.PriorityQueue()
-        searchtree.put((distance(self), ['',  ThistleCube(cube=self)]))
+        solved = False
+        q = queue.PriorityQueue()
+        q.put((0, [' ', self]))
+        visited = set()
 
-        while not searchtree.empty():
-            [queue_move, queue_cube] = searchtree.get()
+        moves = 'RLUDFBrludfb'
 
-            print(queue_move, distance(queue_cube))
+        while not q.empty() and not solved:
+            (_, [path, cube]) = q.get()
+            if cube.cube not in visited:
+                visited.add(cube.cube)
+                if heur(cube) == 0:
+                    solved   = True
+                    solution = path
+                else:
+                    for move in moves:
+                        new_cube = ThistleCube(cube)
+                        new_cube.move_cube(move)
+                        new_path = path + move
+                        q.put(((len(new_path) + heur(new_cube)), [new_path, new_cube]))
 
-            if distance(queue_cube) > 0:
-                for move in self.moves_dict.keys():
-                    test_cube = ThistleCube(cube=queue_cube)
-                    test_cube.move_cube(move)
-                    print(queue_move + move, distance(test_cube))
-                    searchtree.put((distance(test_cube), [queue_move + move, test_cube]) )
-            else:
-                break
-
-
-
-
-
-
-
-
-
-        return ''
-
-
-
-
-
-
+        return solution, len(visited)

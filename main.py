@@ -129,8 +129,10 @@ def on_key(event):
         print(t)
 
     if event.key == 'Y':
-       # moves = 'rRCrFSUVrCSuUrM  DCDUCd-BFRlFRLF-RGRGERVrGL-ECVEMVGVC'
-        moves  = 'buDfCFuUEVLLdMGCGULf bulGrfLEl'
+        moves = 'rRCrFSUVrCSuUrM  DCDUCd-BFRlFRLF-RGRGERVrGL-ECVEMVGVC' # Thistle
+        moves  = 'buDfCFuUEVLLdMGCGULf bulGrfLEl' # A* Corners
+        moves  = 'DdBGMVVRuDdGCVRGRfSVBVRbRVVfUUfrSRfSEdfu BSBEVRUSfVGVf' # A* and Edges 5'11''
+        moves = 'UBDGuCRGFGEFBCuGDDfl BDflCDCfEMFlVFV' # A* and Edges 2'13s with Visited pruning
         move_cube(moves)
 
 
