@@ -26,7 +26,7 @@
   </tr>
   <tr>
     <td><img src="doc/group3.png" width="300" /></td>
-    <td><img src="doc/Solved.png" width="300" /></td>
+    <td><img src="doc/solved.png" width="300" /></td>
     <td></td>
   </tr>
   <tr>
