@@ -31,9 +31,8 @@
   </tr>
   <tr>
     <td>In group 3 all the corners are in their correct subgroup (Tetrad) and all the edges are in their correct subgroup (slice). To solve the cube only half turns are needed. In group 3 parity is even, and twist is 0.</td>
-    <td>Note parity is the 'oddness' number of quarter turns needed to solve the cube. Ever quarter turn ofd the cube flips the parity from odd to even (or vice versa.)
-Twist takes values 0,1, and 2. It is not implemen ted because I don't underfstand it well enough to implement. Group 3 is over implemented to allow the cube to solve. </td>
- <td></td> 
+    <td>Note parity is the 'oddness' number of quarter turns needed to solve the cube. Ever quarter turn ofd the cube flips the parity from odd to even (or vice versa.) </td>
+    <td> Twist takes values 0,1, and 2. It is not implemented because I don't underfstand it well enough to implement. Group 3 is over implemented to allow the cube to solve. </td> 
 </tr>
 </table>
 
