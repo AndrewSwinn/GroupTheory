@@ -183,10 +183,10 @@ class ThistleCube:
     def optimal(self):
 
         def heur(cube):
-            estimate = 0
-            for i in range(0):
-                if cube.cube[i] != i:
-                    estimate+=1 + (cube.cube[i]>12)
+            estimate = 12
+            #for i in range(0):
+            #    if cube.cube[i] != i:
+            #        estimate+=1 + (cube.cube[i]>12)
             for i in range(8):
                 if cube.cube[12 + i] != i:
                     estimate+=1 + (cube.cube[12 + i]>8)
