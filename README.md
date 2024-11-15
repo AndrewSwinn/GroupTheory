@@ -1,5 +1,12 @@
 # Rubiks Cube Solver
 
+## Usage
+```
+pip install numpy matplotlib requests
+mkdir rsc
+python3 main.py
+```
+
 ## Thistlewaite's Algorithm
 
 <table>
