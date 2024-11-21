@@ -123,6 +123,12 @@ def on_key(event):
         print(solution)
         move_cube(solution)
 
+    if event.key == 'O':
+        c.target_azim, c.target_elev = -60, 30
+        solution, nodes = t.optimal()
+        print(solution)
+        move_cube(solution)
+
 
     if event.key == 't':
 
