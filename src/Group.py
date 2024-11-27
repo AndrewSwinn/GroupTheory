@@ -7,6 +7,10 @@ class Element:
         self.number = number
         self.permutation = permutation
 
+    def __str__(self):
+
+        return str(self.name)
+
 
 
 class Group:
@@ -39,7 +43,8 @@ class Group:
             for cycle in generator:
                 permute_length = max(permute_length, max(cycle))
 
-        identity = Element(name='e', number=1, permutation=tuple([i for i in range(1, permute_length + 1)]))
+        identity = Element(name=['e'], number=1, permutation=[tuple([i for i in range(1, permute_length + 1)])])
+
 
         #create group (unsorted and unnumbered)
         group = [identity]
@@ -47,20 +52,20 @@ class Group:
         while new:
             new, new_members = False, []
             for member in group:
-
+                member_name, member_permutation = member.name[0], member.permutation[0]
                 for name, cycles in generators.items():
-                    orig_permutation = list(member.permutation)
-                    work_permutation = list(member.permutation)
-                    new_name = (name + member.name).replace('e', '')
+                    orig_permutation = list(member_permutation)
+                    work_permutation = list(member_permutation)
+                    new_name = (name + member_name).replace('e', '')
                     for cycle in cycles:
                         sublist = deque(cycle)
                         sublist.rotate(1)
                         for i, element in enumerate(sublist):
                             work_permutation[cycle[i] - 1] = orig_permutation[sublist[i] - 1]
 
-                    if (tuple(work_permutation) not in [element.permutation for element in group]) and (
+                    if (tuple(work_permutation) not in [element.permutation[0] for element in group]) and (
                             tuple(work_permutation) not in [element.permutation for element in new_members]):
-                        new_members.append(Element(new_name, 0,  tuple(work_permutation)))
+                        new_members.append(Element([new_name], 0,  [tuple(work_permutation)]))
 
             if len(new_members) > 0:
                 new = True
@@ -93,6 +98,9 @@ if __name__ == "__main__":
 
     g = Group(generators={'r': [(1,2,3,4,5,6)], 'f':[(2,6),(3,5)]})
 
+    for e in g.elements:
+        print(e, e.number, e.permutation)
 
 
-    print(g.element_multiply('f', 'f'))
+
+    #print(g.element_multiply('f', 'f'))
