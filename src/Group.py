@@ -10,7 +10,7 @@ class Element:
 
     def __str__(self):
 
-        return str(self.name)
+        return str(self.name) + "\t" +  str(self.number) + "\t" + str(self.permutations)
 
 
 
@@ -44,12 +44,19 @@ class Group:
 
     def _direct_product(self,factors):
 
-        base = factors[0]
+        base_elements = factors[0].elements
 
         for factor in factors[1:]:
+            elements = []
             for factor_element in factor.elements:
-                for element in base.elements:
-                    pass
+                for element in base_elements:
+                    elements.append(Element(name         = factor_element.name         + element.name,
+                                            number       = factor_element.number       + element.number,
+                                            permutations = factor_element.permutations + element.permutations))
+            base_elements = elements
+
+        return elements
+
 
 
 
@@ -119,8 +126,17 @@ if __name__ == "__main__":
 
     C3 = Group(generators={'r': [(1,2,3)]})
     C4 = Group(generators={'r': [(1,2,3,4)]})
+    C5 = Group(generators={'r': [(1,2,3,4,5)]})
 
     C3C4 = Group(factors=[C3, C4])
+    C3C4C5 = Group(factors=[C3, C4, C5])
+
+    print(len(C3C4C5.elements))
+    
+    for element in C3C4C5.elements:
+
+        print(element)
+
 
 
 
@@ -135,7 +151,7 @@ if __name__ == "__main__":
         return table
 
 
-    mult = multiplication_table(C4)
+    mult = multiplication_table(C3C4)
 
 
 
