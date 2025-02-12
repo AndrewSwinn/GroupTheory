@@ -1,4 +1,6 @@
 from collections import deque
+import copy
+
 from itertools import permutations
 
 import numpy as np
@@ -11,8 +13,10 @@ class Element:
         self.permutation = permutation
 
     def __str__(self):
+        return str(self.name) + str(self.permutation)
 
-        return str(self.name)
+    def re_number(self, offset):
+        self.permutation = tuple([i + offset for i in self.permutation])
 
 
 
@@ -90,25 +94,42 @@ class Group:
 
     # Takes 2 elements of the group, multiplies them together and returns the product
     def element_multiply(self, element1, element2):
-        permutations1, permutations2 = element1.permutations, element2.permutations
-        result = []
-        for i, perm1 in enumerate(permutations1):
-            perm2 = permutations2[i]
-            result.append(tuple([perm1[i - 1] for i in perm2]))
-        for element in self.elements:
-            for i, permutation in enumerate(element.permutations):
-                if permutation == result[i]:
-                    return element
+
+        new_permutation = tuple([element1.permutation[index-1] for index in element2.permutation])
+
+        return [element for element in self.elements if element.permutation == new_permutation][0]
+
+
 
     def _direct_product(self, factors):
 
-        for group in factors:
-            pass
+        #take a copy of each of the factors and renumber the permutation elements so they don't overlap
+        factors = [copy.deepcopy(factor) for factor in factors]
+        permute_offset = 0
+        for factor in factors:
+            for element in factor.elements:
+                element.re_number(permute_offset)
 
+            permute_offset += len(factor.elements[0].permutation)
+
+        base_elements = factors[0].elements
+
+        element_number = 1
         for factor in factors[1:]:
+            elements = []
             for factor_element in factor.elements:
-                for element in base.elements:
-                    pass
+                for element in base_elements:
+                    elements.append(Element(name         = element.name + ':' +  factor_element.name   ,
+                                            number       = element_number,
+                                            permutation  = element.permutation + factor_element.permutation))
+                    element_number += 1
+            base_elements = elements
+
+        return elements
+
+    def get_element(self, pretty_name):
+
+        return [element for element in self.elements if self._pretty_name(element.name) == pretty_name][0]
 
 
 
@@ -117,8 +138,9 @@ if __name__ == "__main__":
 
     C3 = Group(generators={'r': [(1,2,3)]})
     C4 = Group(generators={'r': [(1,2,3,4)]})
+    C5 = Group(generators={'r': [(1, 2, 3, 4, 5)]})
 
-    #C3C4 = Group(factors=[C3, C4])
+    C3C4 = Group(factors=[C3, C4, C5, C3])
     #
     #
     #
@@ -137,5 +159,12 @@ if __name__ == "__main__":
     #
     #
 
-    for i, element in enumerate(C4.elements):
-        print(i, C4._pretty_name(element.name), element.number, element.permutation)
+    for i, element in enumerate(C3C4.elements):
+        print(i, C3C4._pretty_name(element.name), element.number, element.permutation)
+
+    e1 = C3C4.get_element(pretty_name='r2:r3:r4:r2' )
+    e2 = C3C4.get_element(pretty_name='r2:e:e:e' )
+
+    prod = C3C4.element_multiply(e1, e2)
+
+    print(prod)
