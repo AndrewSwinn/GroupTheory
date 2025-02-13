@@ -9,28 +9,15 @@ import numpy as np
 class Element:
     def __init__(self, name, number, permutation):
         self.name = name
+        self.pretty_name = self._pretty_name(name)
         self.number = number
         self.permutation = permutation
 
     def __str__(self):
-        return str(self.name) + str(self.permutation)
+        return str(self.number) + " " + str(self.name) + " " + str(self.permutation)
 
     def re_number(self, offset):
         self.permutation = tuple([i + offset for i in self.permutation])
-
-
-
-class Group:
-    def __init__(self, **kwargs):
-
-        generators = kwargs.get('generators')
-        factors    = kwargs.get('factors')
-
-        if generators is not None:
-            self.elements = self._generate_group(generators)
-
-        elif factors is not None:
-            self.elements = self._direct_product(factors)
 
     def _pretty_name(self, name):
         pretty_name = ''
@@ -46,6 +33,21 @@ class Group:
             pretty_name += str(count)
 
         return pretty_name
+
+
+
+class Group:
+    def __init__(self, **kwargs):
+
+        generators = kwargs.get('generators')
+        factors    = kwargs.get('factors')
+
+        if generators is not None:
+            self.elements = self._generate_group(generators)
+
+        elif factors is not None:
+            self.elements = self._direct_product(factors)
+
 
     def _generate_group(self, generators):
         #create identity
@@ -114,12 +116,16 @@ class Group:
 
         base_elements = factors[0].elements
 
-        element_number = 1
+
         for factor in factors[1:]:
             elements = []
+            element_number = 1
             for factor_element in factor.elements:
                 for element in base_elements:
-                    elements.append(Element(name         = element.name + ':' +  factor_element.name   ,
+                    new_name = element.name.replace('(', '')
+                    new_name = new_name.replace(')', '')
+                    new_name = '(' +  new_name + ',' +  factor_element.name + ')'
+                    elements.append(Element(name         = new_name,
                                             number       = element_number,
                                             permutation  = element.permutation + factor_element.permutation))
                     element_number += 1
@@ -129,7 +135,7 @@ class Group:
 
     def get_element(self, pretty_name):
 
-        return [element for element in self.elements if self._pretty_name(element.name) == pretty_name][0]
+        return [element for element in self.elements if element.pretty_name == pretty_name][0]
 
 
 
@@ -159,12 +165,15 @@ if __name__ == "__main__":
     #
     #
 
-    for i, element in enumerate(C3C4.elements):
-        print(i, C3C4._pretty_name(element.name), element.number, element.permutation)
+    for element in C3C4.elements:
 
-    e1 = C3C4.get_element(pretty_name='r2:r3:r4:r2' )
-    e2 = C3C4.get_element(pretty_name='r2:e:e:e' )
+        print(element.pretty_name, element.number, element.permutation)
+
+    e1 = C3C4.get_element(pretty_name='(r2,r3,r4,r2)' )
+    e2 = C3C4.get_element(pretty_name='(r2,e,e,e)' )
 
     prod = C3C4.element_multiply(e1, e2)
-
+    print()
+    print(e1)
+    print(e2)
     print(prod)
