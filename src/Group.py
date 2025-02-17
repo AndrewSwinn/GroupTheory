@@ -1,8 +1,8 @@
-from collections import deque
+
 import copy
-
+import itertools
+from collections import deque
 from itertools import permutations
-
 import numpy as np
 
 
@@ -15,6 +15,7 @@ class Element:
 
     def __str__(self):
         return str(self.number) + " " + str(self.name) + " " + str(self.permutation)
+
 
     def re_number(self, offset):
         self.permutation = tuple([i + offset for i in self.permutation])
@@ -41,13 +42,38 @@ class Group:
 
         generators = kwargs.get('generators')
         factors    = kwargs.get('factors')
+        elements   = kwargs.get('elements')
 
+        # Create elements (members) of the group
         if generators is not None:
             self.elements = self._generate_group(generators)
-
         elif factors is not None:
             self.elements = self._direct_product(factors)
+        else: self.elements = elements
 
+
+
+    def __eq__(self, group):
+
+        #check that every element in 'self' maps to group, and vice versa
+        self_permutations  = [element.permutation for element in self.elements]
+        group_permutations = [element.permutation for element in group.elements]
+
+        return self._bijection(self_permutations, group_permutations)
+
+
+    def _bijection(self, permutations_1, permutations_2):
+        equal = True
+        for permutation in permutations_1:
+            if permutation not in permutations_2:
+                equal = False
+                break
+        if equal:
+            for permutation in permutations_2:
+                if permutation not in permutations_1:
+                    equal = False
+                    break
+        return equal
 
     def _generate_group(self, generators):
         #create identity
@@ -67,10 +93,10 @@ class Group:
         while new:
             new, new_members = False, []
             group_permutations = [element.permutation for element in group]
-            for generator_name, permutations in generators.items():
+            for generator_name, permute_cycles in generators.items():
                 for member in group:
                     member_name, member_permutation = member.name, member.permutation
-                    new_permutation = self._apply(permutations, member_permutation)
+                    new_permutation = self._apply(permute_cycles, member_permutation)
                     #Create new members as needed
                     if new_permutation not in group_permutations:
                         new = True
@@ -81,10 +107,51 @@ class Group:
 
         return group
 
-    def _apply(self, permutations, member_permutation):
+
+
+    def _subgroup(self, elements):
+        identity =  self.get_identity()
+        subgroup = [identity]
+        for start in subgroup:
+            for element in elements:
+                new_element = self.element_multiply(start, element)
+                if new_element.number not in [element.number for element in subgroup]:
+                    subgroup.append(new_element)
+        return Group(elements = subgroup)
+
+    def subgroups(self):
+        self.subgroups = []
+        for length in range(1, len(self.elements) + 1):
+            for elements in itertools.combinations(self.elements, length):
+                subgroup = self._subgroup(elements)
+                if subgroup not in self.subgroups:
+                    self.subgroups.append(subgroup)
+
+    def _coset(self, multiplier, subgroup):
+        coset = []
+        for element in subgroup.elements:
+            product = self.element_multiply(multiplier, element)
+            coset.append(product)
+        return coset
+
+    def cosets(self, subgroup):
+        cosets = []
+        for element in self.elements:
+            coset = self._coset(element, subgroup)
+            coset_permutations = [element.permutation for element in coset]
+            new = True
+            for existing in cosets:
+                existing_permutation = [element.permutation for element in existing]
+                new = new & self._bijection(coset_permutations, existing_permutation)
+            if new: cosets.append(coset)
+        return cosets
+
+
+    def _apply(self, permute_cycles, member_permutation):
         working_permutation = list(member_permutation)
         new_permutation     = list(member_permutation)
-        for permutation in permutations:
+        for permutation in permute_cycles:
+            #print(permutation)
             #cycle has the elements of permutation cycled round once
             cycle = deque(permutation)
             cycle.rotate(1)
@@ -96,9 +163,7 @@ class Group:
 
     # Takes 2 elements of the group, multiplies them together and returns the product
     def element_multiply(self, element1, element2):
-
         new_permutation = tuple([element1.permutation[index-1] for index in element2.permutation])
-
         return [element for element in self.elements if element.permutation == new_permutation][0]
 
 
@@ -115,7 +180,6 @@ class Group:
             permute_offset += len(factor.elements[0].permutation)
 
         base_elements = factors[0].elements
-
 
         for factor in factors[1:]:
             elements = []
@@ -137,6 +201,11 @@ class Group:
 
         return [element for element in self.elements if element.pretty_name == pretty_name][0]
 
+    def get_identity(self):
+        return [element for element in self.elements if element.number == 1][0]
+
+
+
 
 
 
@@ -145,35 +214,11 @@ if __name__ == "__main__":
     C3 = Group(generators={'r': [(1,2,3)]})
     C4 = Group(generators={'r': [(1,2,3,4)]})
     C5 = Group(generators={'r': [(1, 2, 3, 4, 5)]})
+    C6 = Group(generators={'r': [(1, 2, 3, 4, 5, 6)]})
 
     C3C4 = Group(factors=[C3, C4, C5, C3])
-    #
-    #
-    #
-    # def multiplication_table(group):
-    #     order = len(group.elements)
-    #     table = np.zeros(shape=(order, order))
-    #
-    #     for i in group.elements:
-    #         for j in group.elements:
-    #             product = group.element_multiply(i, j)
-    #             table[i.number[0] - 1, j.number[0] - 1] = product.number[0]
-    #     return table
-    #
-    #
-    # mult = multiplication_table(C4)
-    #
-    #
 
-    for element in C3C4.elements:
+    G = C6.subgroup([C6.get_element('r2'), C6.get_element('r3')])
 
-        print(element.pretty_name, element.number, element.permutation)
-
-    e1 = C3C4.get_element(pretty_name='(r2,r3,r4,r2)' )
-    e2 = C3C4.get_element(pretty_name='(r2,e,e,e)' )
-
-    prod = C3C4.element_multiply(e1, e2)
-    print()
-    print(e1)
-    print(e2)
-    print(prod)
+    for element in G.elements:
+        print(element)
