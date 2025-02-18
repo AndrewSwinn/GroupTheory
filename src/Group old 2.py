@@ -16,9 +16,6 @@ class Element:
     def __str__(self):
         return str(self.number) + " " + str(self.name) + " " + str(self.permutation)
 
-    def __eq__(self, other):
-        return self.permutation == other.permutation
-
 
     def re_number(self, offset):
         self.permutation = tuple([i + offset for i in self.permutation])
@@ -37,38 +34,6 @@ class Element:
             pretty_name += str(count)
 
         return pretty_name
-
-class ElementSet:
-    def __init__(self, elements=[]):
-        self.elements = elements
-
-    def __str__(self):
-        return [element.name for element in self.elements]
-
-    def __iter__(self):
-        return iter(self.elements)
-
-    def __eq__(self, other):
-        equal = True
-
-        for element in self.elements:
-            if element not in group.elements:
-                equal = False
-                break
-        if equal:
-            for element in group.elements:
-                if element not in self.elements:
-                    equal = False
-                    break
-        return equal
-
-    def add(self, element):
-        exists = True
-        if element not in self.elements:
-            self.elements.append(element)
-            exists = False
-        return exists
-
 
 
 
@@ -119,15 +84,11 @@ class Group:
 
         element_number = 1
         identity =  Element(name='e', number=element_number, permutation=tuple([i for i in range(1, permute_length + 1)]))
-
-        self.elementset = ElementSet([identity])
-        for generator_name, permute_cycles in generators.items():
-            for element in self.elementset:
-                pass
-
+        element_number += 1
 
         group = [identity]
         new = True
+
         #keep applying generator until no new group members created:
         while new:
             new, new_members = False, []
