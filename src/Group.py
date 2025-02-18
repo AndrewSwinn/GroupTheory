@@ -38,12 +38,28 @@ class Element:
 
         return pretty_name
 
+    def generate(self, generator_name, permute_cycles):
+        working_permutation = list(self.permutation)
+        new_permutation     = list(self.permutation)
+        for permutation in permute_cycles:
+            # print(permutation)
+            # cycle has the elements of permutation cycled round once
+            cycle = deque(permutation)
+            cycle.rotate(1)
+            for i, index in enumerate(permutation):
+                new_permutation[cycle[i] - 1] = working_permutation[permutation[i] - 1]
+        new_name = (self.name + generator_name).replace('e','')
+        new_number = 2
+        return Element(new_name, new_number, tuple(new_permutation))
+
+
+
 class ElementSet:
     def __init__(self, elements=[]):
         self.elements = elements
 
     def __str__(self):
-        return [element.name for element in self.elements]
+        return str([element.name for element in self.elements])
 
     def __iter__(self):
         return iter(self.elements)
@@ -63,11 +79,11 @@ class ElementSet:
         return equal
 
     def add(self, element):
-        exists = True
+        added = False
         if element not in self.elements:
             self.elements.append(element)
-            exists = False
-        return exists
+            added = True
+        return added
 
 
 
@@ -81,12 +97,13 @@ class Group:
 
         # Create elements (members) of the group
         if generators is not None:
-            self.elements = self._generate_group(generators)
+            self.elementset = self._generate_group(generators)
         elif factors is not None:
-            self.elements = self._direct_product(factors)
+            self.elementset = self._direct_product(factors)
         else: self.elements = elements
 
-
+    def __len__(self):
+        return len(self.elementset.elements)
 
     def __eq__(self, group):
 
@@ -120,31 +137,22 @@ class Group:
         element_number = 1
         identity =  Element(name='e', number=element_number, permutation=tuple([i for i in range(1, permute_length + 1)]))
 
-        self.elementset = ElementSet([identity])
-        for generator_name, permute_cycles in generators.items():
-            for element in self.elementset:
-                pass
+        elementset = ElementSet([identity])
 
-
-        group = [identity]
-        new = True
-        #keep applying generator until no new group members created:
-        while new:
-            new, new_members = False, []
-            group_permutations = [element.permutation for element in group]
+        new_count = 1
+        while new_count != 0:
+            new_count = 0
             for generator_name, permute_cycles in generators.items():
-                for member in group:
-                    member_name, member_permutation = member.name, member.permutation
-                    new_permutation = self._apply(permute_cycles, member_permutation)
-                    #Create new members as needed
-                    if new_permutation not in group_permutations:
-                        new = True
-                        group_permutations.append(new_permutation)
-                        new_name = (member_name + generator_name) .replace('e', '')
-                        group.append(Element(name=new_name, number=element_number, permutation=new_permutation))
-                        element_number += 1
+                for element in elementset:
+                    new_element = element.generate(generator_name, permute_cycles)
+                    new_count += elementset.add(new_element)
 
-        return group
+        return elementset
+
+
+
+
+
 
 
 
@@ -195,18 +203,6 @@ class Group:
         return self._cosets(subgroup)[0]
 
 
-    def _apply(self, permute_cycles, member_permutation):
-        working_permutation = list(member_permutation)
-        new_permutation     = list(member_permutation)
-        for permutation in permute_cycles:
-            #print(permutation)
-            #cycle has the elements of permutation cycled round once
-            cycle = deque(permutation)
-            cycle.rotate(1)
-            for i, index in enumerate(permutation):
-                new_permutation[cycle[i] - 1] = working_permutation[permutation[i] - 1]
-        return tuple(new_permutation)
-
 
 
     # Takes 2 elements of the group, multiplies them together and returns the product
@@ -222,11 +218,11 @@ class Group:
         factors = [copy.deepcopy(factor) for factor in factors]
         permute_offset = 0
         for factor in factors:
-            for element in factor.elements:
+            for element in factor.elementset:
                 element.re_number(permute_offset)
 
-            permute_offset += len(factor.elements[0].permutation)
-
+            permute_offset += len(factor.elementset.elements[0].permutation)
+        TODO Finish
         base_elements = factors[0].elements
 
         for factor in factors[1:]:
@@ -265,21 +261,21 @@ if __name__ == "__main__":
     C4 = Group(generators={'r': [(1,2,3,4)]})
     C5 = Group(generators={'r': [(1, 2, 3, 4, 5)]})
     C6 = Group(generators={'r': [(1, 2, 3, 4, 5, 6)]})
-    C6.subgroups()
-
+    # C6.subgroups()
+    #
     C3C4 = Group(factors=[C3, C4, C5, C3])
-
+    #
     S3 = Group(generators={'a': [(1, 2, 3)], 'b': [(1, 2)]})
-
-    A4.subgroups()
-    print(len(A4.elements))
-    for subgroup in A4.subgroups:
-        quotant = A4.quotant(subgroup)
-        print([element.name for element in subgroup.elements], [element.name for element in quotant] )
-
-
-
-
+    #
+    # A4.subgroups()
+    # print(len(A4.elements))
+    # for subgroup in A4.subgroups:
+    #     quotant = A4.quotant(subgroup)
+    #     print([element.name for element in subgroup.elements], [element.name for element in quotant] )
+    #
+    #
+    #
+    #
 
 
 
