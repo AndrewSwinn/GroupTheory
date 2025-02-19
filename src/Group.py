@@ -7,14 +7,13 @@ import numpy as np
 
 
 class Element:
-    def __init__(self, name, number, permutation):
+    def __init__(self, name, permutation):
         self.name = name
         self.pretty_name = self._pretty_name(name)
-        self.number = number
         self.permutation = permutation
 
     def __str__(self):
-        return str(self.number) + " " + str(self.name) + " " + str(self.permutation)
+        return str(self.name) + " " + str(self.permutation)
 
     def __eq__(self, other):
         return self.permutation == other.permutation
@@ -49,8 +48,7 @@ class Element:
             for i, index in enumerate(permutation):
                 new_permutation[cycle[i] - 1] = working_permutation[permutation[i] - 1]
         new_name = (self.name + generator_name).replace('e','')
-        new_number = 2
-        return Element(new_name, new_number, tuple(new_permutation))
+        return Element(new_name, tuple(new_permutation))
 
 
 
@@ -64,15 +62,18 @@ class ElementSet:
     def __iter__(self):
         return iter(self.elements)
 
+    def __len__(self):
+        return len(self.elements)
+
     def __eq__(self, other):
         equal = True
 
         for element in self.elements:
-            if element not in group.elements:
+            if element not in other.elements:
                 equal = False
                 break
         if equal:
-            for element in group.elements:
+            for element in other.elements:
                 if element not in self.elements:
                     equal = False
                     break
@@ -85,6 +86,42 @@ class ElementSet:
             added = True
         return added
 
+    def multiply(self, element1, element2):
+
+        new_permutation = tuple([element1.permutation[index-1] for index in element2.permutation])
+        product_list = [element for element in self.elements if element.permutation == new_permutation]
+        if len(product_list) == 1:
+            return product_list[0]
+        else:
+            return None
+
+    def set_multiply(self, element, elementset):
+        prodset = ElementSet(elements=[])
+        for element2 in elementset:
+            product = self.multiply(element, element2)
+            prodset.add(product)
+        return prodset
+
+
+    def get_identity(self):
+        for element1 in self:
+            identity = True
+            for element2 in self:
+                element3 = self.multiply(element1, element2)
+                if element3 != element2:
+                    identity is False
+                    break
+            if identity:
+                return element1
+        return None
+
+    def is_closed(self):
+        for element1 in self:
+            for element2 in self:
+                element3 = self.multiply(element1, element2)
+                if element3 is None:
+                    return False
+        return True
 
 
 
@@ -93,39 +130,26 @@ class Group:
 
         generators = kwargs.get('generators')
         factors    = kwargs.get('factors')
-        elements   = kwargs.get('elements')
+        elementset = kwargs.get('elementset')
+
 
         # Create elements (members) of the group
         if generators is not None:
             self.elementset = self._generate_group(generators)
         elif factors is not None:
             self.elementset = self._direct_product(factors)
-        else: self.elements = elements
+        elif elementset is not None:
+            self.elementset=  elementset
+        else:
+            print('Cannot create an empty group')
 
     def __len__(self):
         return len(self.elementset.elements)
 
     def __eq__(self, group):
 
-        #check that every element in 'self' maps to group, and vice versa
-        self_permutations  = [element.permutation for element in self.elements]
-        group_permutations = [element.permutation for element in group.elements]
+        return self.elementset == group.elementset
 
-        return self._bijection(self_permutations, group_permutations)
-
-
-    def _bijection(self, permutations_1, permutations_2):
-        equal = True
-        for permutation in permutations_1:
-            if permutation not in permutations_2:
-                equal = False
-                break
-        if equal:
-            for permutation in permutations_2:
-                if permutation not in permutations_1:
-                    equal = False
-                    break
-        return equal
 
     def _generate_group(self, generators):
         #create identity
@@ -134,8 +158,7 @@ class Group:
             for cycle in generator:
                 permute_length = max(permute_length, max(cycle))
 
-        element_number = 1
-        identity =  Element(name='e', number=element_number, permutation=tuple([i for i in range(1, permute_length + 1)]))
+        identity =  Element(name='e', permutation=tuple([i for i in range(1, permute_length + 1)]))
 
         elementset = ElementSet([identity])
 
@@ -149,69 +172,6 @@ class Group:
 
         return elementset
 
-
-
-
-
-
-
-
-    def _subgroup(self, elements):
-        identity =  self.get_identity()
-        subgroup = [identity]
-        for start in subgroup:
-            for element in elements:
-                new_element = self.element_multiply(start, element)
-                if new_element.number not in [element.number for element in subgroup]:
-                    subgroup.append(new_element)
-        return Group(elements = subgroup)
-
-    def subgroups(self):
-        self.subgroups = []
-        for length in range(1, len(self.elements) + 1):
-            for elements in itertools.combinations(self.elements, length):
-                subgroup = self._subgroup(elements)
-                if subgroup not in self.subgroups:
-                    self.subgroups.append(subgroup)
-
-    def _coset(self, multiplier, subgroup):
-        coset = []
-        for element in subgroup.elements:
-            product = self.element_multiply(multiplier, element)
-            coset.append(product)
-        return coset
-
-    def _cosets(self, subgroup):
-        quotant, cosets = [], []
-        for element in self.elements:
-            coset = self._coset(element, subgroup)
-            coset_permutations = [element.permutation for element in coset]
-            new = True
-            for existing in cosets:
-                existing_permutation = [element.permutation for element in existing]
-                new = True if new and self._bijection(coset_permutations, existing_permutation) is False else False
-            if new:
-                quotant.append(element)
-                cosets.append(coset)
-
-        return quotant, cosets
-
-    def cosets(self, subgroup):
-        return self._cosets(subgroup)[1]
-
-    def quotant(self, subgroup):
-        return self._cosets(subgroup)[0]
-
-
-
-
-    # Takes 2 elements of the group, multiplies them together and returns the product
-    def element_multiply(self, element1, element2):
-        new_permutation = tuple([element1.permutation[index-1] for index in element2.permutation])
-        return [element for element in self.elements if element.permutation == new_permutation][0]
-
-
-
     def _direct_product(self, factors):
 
         #take a copy of each of the factors and renumber the permutation elements so they don't overlap
@@ -220,36 +180,69 @@ class Group:
         for factor in factors:
             for element in factor.elementset:
                 element.re_number(permute_offset)
-
             permute_offset += len(factor.elementset.elements[0].permutation)
-        TODO Finish
-        base_elements = factors[0].elements
 
+        base_elementset = factors[0].elementset
         for factor in factors[1:]:
-            elements = []
-            element_number = 1
-            for factor_element in factor.elements:
-                for element in base_elements:
+            elementset = ElementSet(elements=[])
+            for factor_element in factor.elementset:
+                for element in base_elementset:
                     new_name = element.name.replace('(', '')
                     new_name = new_name.replace(')', '')
                     new_name = '(' +  new_name + ',' +  factor_element.name + ')'
-                    elements.append(Element(name         = new_name,
-                                            number       = element_number,
-                                            permutation  = element.permutation + factor_element.permutation))
-                    element_number += 1
-            base_elements = elements
+                    new_element = Element(new_name, element.permutation + factor_element.permutation)
+            base_elementset = copy.deepcopy(elementset)
 
-        return elements
-
-    def get_element(self, pretty_name):
-
-        return [element for element in self.elements if element.pretty_name == pretty_name][0]
+        return elementset
 
     def get_identity(self):
-        return [element for element in self.elements if element.number == 1][0]
+        return self.elementset.get_identity()
+
+    def _subgroup(self, elements):
+        subset = ElementSet(elements=[])
+        identity =  self.get_identity()
+        subset.add(identity)
+
+        new_count = 1
+        while new_count != 0:
+            new_count  = 0
+            for element1 in subset:
+                for element2 in elements:
+                    new_element = self.element_multiply(element1, element2)
+                    new_count += subset.add(new_element)
+        return subset
+
+    def subgroups(self):
+        subgroups = []
+        for length in range(1, len(self) + 1):
+            for elements in itertools.combinations(self.elementset, length):
+                subgroup = self._subgroup(elements)
+                if subgroup not in subgroups:
+                   subgroups.append(subgroup)
+        return subgroups
+
+
+    TODO ALMOST !!!
+    def quotient(self, subgroup):
+        quotient, cosets = ElementSet(elements=[]), []
+        for element in self.elementset:
+            coset = self.elementset.set_multiply(element, subgroup.elementset)
+
+            if coset not in cosets:
+                cosets.append(coset)
+                quotient.add(element)
+
+        return quotient
 
 
 
+
+
+
+    # Takes 2 elements of the group, multiplies them together and returns the product
+    def element_multiply(self, element1, element2):
+
+        return self.elementset.multiply(element1, element2)
 
 
 
@@ -261,23 +254,21 @@ if __name__ == "__main__":
     C4 = Group(generators={'r': [(1,2,3,4)]})
     C5 = Group(generators={'r': [(1, 2, 3, 4, 5)]})
     C6 = Group(generators={'r': [(1, 2, 3, 4, 5, 6)]})
-    # C6.subgroups()
-    #
-    C3C4 = Group(factors=[C3, C4, C5, C3])
+        #
+    C3C4 = Group(factors=[C3, C4, C3, C5])
     #
     S3 = Group(generators={'a': [(1, 2, 3)], 'b': [(1, 2)]})
-    #
-    # A4.subgroups()
-    # print(len(A4.elements))
-    # for subgroup in A4.subgroups:
-    #     quotant = A4.quotant(subgroup)
-    #     print([element.name for element in subgroup.elements], [element.name for element in quotant] )
-    #
-    #
-    #
-    #
+
+    group = A4
+    for elementset in group.subgroups():
+        subgroup = Group(elementset=elementset)
+        quotient = group.quotient(subgroup)
+        quot_identity = quotient.get_identity()
+        print(subgroup.elementset, quotient, quot_identity.name, quotient.is_closed())
 
 
 
+    print(len(C3C4.elementset))
+    print(C3C4.get_identity())
 
 
