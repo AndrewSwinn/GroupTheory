@@ -4,6 +4,7 @@ import itertools
 from collections import deque
 from itertools import permutations
 import numpy as np
+import math
 
 
 class Element:
@@ -113,7 +114,7 @@ class ElementSet:
                     break
             if identity:
                 return element1
-        return None
+        return False
 
     def is_closed(self):
         for element1 in self:
@@ -182,7 +183,7 @@ class Group:
                 element.re_number(permute_offset)
             permute_offset += len(factor.elementset.elements[0].permutation)
 
-        base_elementset = factors[0].elementset
+        base_elementset = copy.deepcopy(factors[0].elementset)
         for factor in factors[1:]:
             elementset = ElementSet(elements=[])
             for factor_element in factor.elementset:
@@ -191,7 +192,9 @@ class Group:
                     new_name = new_name.replace(')', '')
                     new_name = '(' +  new_name + ',' +  factor_element.name + ')'
                     new_element = Element(new_name, element.permutation + factor_element.permutation)
+                    elementset.add(new_element)
             base_elementset = copy.deepcopy(elementset)
+
 
         return elementset
 
@@ -214,15 +217,16 @@ class Group:
 
     def subgroups(self):
         subgroups = []
-        for length in range(1, len(self) + 1):
-            for elements in itertools.combinations(self.elementset, length):
-                subgroup = self._subgroup(elements)
-                if subgroup not in subgroups:
-                   subgroups.append(subgroup)
+        for length in range(1, int(math.sqrt(len(self)) + 1) ):
+            if int(len(self)  / length) == len(self)  / length:
+                print(length)
+                for elements in itertools.combinations(self.elementset, length):
+                    subgroup = self._subgroup(elements)
+                    if subgroup not in subgroups:
+                        subgroups.append(subgroup)
         return subgroups
 
 
-    TODO ALMOST !!!
     def quotient(self, subgroup):
         quotient, cosets = ElementSet(elements=[]), []
         for element in self.elementset:
@@ -232,7 +236,9 @@ class Group:
                 cosets.append(coset)
                 quotient.add(element)
 
-        return quotient
+        if (quotient.get_identity() is not False) and quotient.is_closed()  and (len(quotient) > 1) and (len(quotient) < len(self)):
+            return quotient
+        return False
 
 
 
@@ -249,22 +255,29 @@ class Group:
 if __name__ == "__main__":
 
     A4 = Group(generators={'a': [(2,3,4)], 'b':[(1,2), (3,4)]})
+    A5 = Group(generators={'a': [(1, 2, 3, 4, 5)], 'b': [(1, 2), (3, 4)]})
 
-    C3 = Group(generators={'r': [(1,2,3)]})
-    C4 = Group(generators={'r': [(1,2,3,4)]})
+    C2 = Group(generators={'r': [(1, 2)]})
+    C3 = Group(generators={'r': [(1, 2, 3)]})
+    C4 = Group(generators={'r': [(1, 2, 3, 4)]})
     C5 = Group(generators={'r': [(1, 2, 3, 4, 5)]})
     C6 = Group(generators={'r': [(1, 2, 3, 4, 5, 6)]})
-        #
-    C3C4 = Group(factors=[C3, C4, C3, C5])
-    #
-    S3 = Group(generators={'a': [(1, 2, 3)], 'b': [(1, 2)]})
 
-    group = A4
+    C3C4 = Group(factors=[C2, C2])
+    #
+    S3 = Group(generators={'a': [(1, 2, 3)],    'b': [(1, 2)]})
+    S4 = Group(generators={'a': [(1, 2, 3, 4)], 'b': [(1, 2)]})
+
+    group = C3C4
+
+    print(len(group.elementset))
+    print(group.elementset)
+
     for elementset in group.subgroups():
         subgroup = Group(elementset=elementset)
         quotient = group.quotient(subgroup)
-        quot_identity = quotient.get_identity()
-        print(subgroup.elementset, quotient, quot_identity.name, quotient.is_closed())
+        if quotient or True:
+            print(subgroup.elementset, quotient)
 
 
 
