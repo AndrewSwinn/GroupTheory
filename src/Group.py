@@ -230,7 +230,7 @@ class Group:
             subgroup_length = length + 1
             # Apply Lagrange's theorum
             if int(len(self)  / subgroup_length) == (len(self)  / subgroup_length):
-                print(length)
+                print(subgroup_length)
                 for elements in itertools.combinations(self.elementset, length):
                     subgroup = self._subgroup(elements)
                     if subgroup not in subgroups:
@@ -279,7 +279,7 @@ if __name__ == "__main__":
     S3 = Group(generators={'a': [(1, 2, 3)],    'b': [(1, 2)]})
     S4 = Group(generators={'a': [(1, 2, 3, 4)], 'b': [(1, 2)]})
 
-    group = A5
+    group = S3
 
     print(len(group.elementset))
     print(group.elementset)
