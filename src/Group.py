@@ -87,6 +87,9 @@ class ElementSet:
             added = True
         return added
 
+    def remove(self, element):
+        self.elements.remove(element)
+
     def multiply(self, element1, element2):
 
         new_permutation = tuple([element1.permutation[index-1] for index in element2.permutation])
@@ -174,7 +177,6 @@ class Group:
         return elementset
 
     def _direct_product(self, factors):
-
         #take a copy of each of the factors and renumber the permutation elements so they don't overlap
         factors = [copy.deepcopy(factor) for factor in factors]
         permute_offset = 0
@@ -217,8 +219,17 @@ class Group:
 
     def subgroups(self):
         subgroups = []
-        for length in range(1, int(math.sqrt(len(self)) + 1) ):
-            if int(len(self)  / length) == len(self)  / length:
+        # all subgroups must have an identity - wjocj is added by the _subgroup function
+        copy_elementset = copy.deepcopy(self.elementset)
+        copy_elementset.remove(copy_elementset.get_identity())
+
+        # maximum iterator length (the '-1' is because the identity is added by the _subgroup function
+        max_length = int(len(self.elementset) / 2) - 1
+
+        for length in range(1, max_length):
+            subgroup_length = length + 1
+            # Apply Lagrange's theorum
+            if int(len(self)  / subgroup_length) == (len(self)  / subgroup_length):
                 print(length)
                 for elements in itertools.combinations(self.elementset, length):
                     subgroup = self._subgroup(elements)
@@ -268,7 +279,7 @@ if __name__ == "__main__":
     S3 = Group(generators={'a': [(1, 2, 3)],    'b': [(1, 2)]})
     S4 = Group(generators={'a': [(1, 2, 3, 4)], 'b': [(1, 2)]})
 
-    group = C3C4
+    group = A5
 
     print(len(group.elementset))
     print(group.elementset)
@@ -276,12 +287,12 @@ if __name__ == "__main__":
     for elementset in group.subgroups():
         subgroup = Group(elementset=elementset)
         quotient = group.quotient(subgroup)
-        if quotient or True:
+        if quotient:
             print(subgroup.elementset, quotient)
 
 
 
-    print(len(C3C4.elementset))
-    print(C3C4.get_identity())
+    #print(len(C3C4.elementset))
+    #print(C3C4.get_identity())
 
 
