@@ -222,7 +222,7 @@ class Group:
         return subgroups
 
 
-    #TODO ALMOST !!!
+    TODO ALMOST !!!
     def quotient(self, subgroup):
         quotient, cosets = ElementSet(elements=[]), []
         for element in self.elementset:
