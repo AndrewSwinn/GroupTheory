@@ -222,7 +222,7 @@ class Group:
         return subgroups
 
 
-    TODO ALMOST !!!
+    #TODO ALMOST !!!
     def quotient(self, subgroup):
         quotient, cosets = ElementSet(elements=[]), []
         for element in self.elementset:
@@ -259,7 +259,7 @@ if __name__ == "__main__":
     #
     S3 = Group(generators={'a': [(1, 2, 3)], 'b': [(1, 2)]})
 
-    group = A4
+    group = C4
     for elementset in group.subgroups():
         subgroup = Group(elementset=elementset)
         quotient = group.quotient(subgroup)
